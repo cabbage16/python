@@ -1,5 +1,3 @@
-import os
-
 class ArrayStack:
     def __init__(self, capacity = 10) -> None:
         self.capacity = capacity
@@ -51,47 +49,45 @@ class ArrayStack:
 
         return result
 
-def init():
-    os.system("cls")
-    print("""push: 삽입
-pop: 삭제 후 반환
-peek: 반환
-delete: 스택 초기화
-reverse: 스택 역순으로 배열
-print: 스택 출력
-cls: 화면 초기화
-exit: 시스템 종료""")
+def precedence(op):
+    '''연산자 우선순위 계산함수'''
+    if op in '()': return 0
+    elif op in '+-': return 1
+    elif op in '*/': return 2
+    else: return -1
 
-stack = ArrayStack()
+def Infix2Postfix(expr):
+    '''중위표기 -> 후위표기로 바꾸는 함수'''
+    s = ArrayStack(100)
+    output = []
 
-init()
-print(">>> ", end="")
+    for term in expr:
+        if term in '(':
+            s.push(term)
+        
+        elif term in ')':
+            while not s.isEmpty():
+                op = s.pop()
+                if op == '(':
+                    break
+                else:
+                    output.append(op)
+        
+        elif term in "+-*/":
+            while not s.isEmpty():
+                op = s.peek()
+                if precedence(op) >= precedence(term):
+                    output.append(op)
+                    s.pop()
+                else: break
+            s.push(term)
+        
+        else:
+            output.append(term)
+    
+    while not s.isEmpty():
+        output.append(s.pop())
+    
+    return ''.join(output)
 
-while True:
-    choice = input()
-    
-    if choice == 'push':
-        stack.push(int(input("정수를 입력해주세요: ")))
-        init()
-    
-    elif choice == 'pop':
-        print(stack.pop())
-    
-    elif choice == "peek":
-        print(stack.peek())
-    
-    elif choice == "delete":
-        stack.deleteAll()
-        init()
-    
-    elif choice == "reverse":
-        stack.reverse()
-        init()
-    
-    elif choice == 'print':
-        print(stack)
-    
-    elif choice == 'exit':
-        break
-
-    print(">>> ", end="")
+print(Infix2Postfix(list(input())))
