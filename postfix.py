@@ -51,49 +51,45 @@ class ArrayStack:
 
         return result
 
-def init():
-    print('-' * 30)
-    print("""push: 삽입
-pop: 삭제 후 반환
-peek: 반환
-clear: 스택 초기화
-reverse: 스택 역순으로 배열
-print: 스택 출력
-exit: 시스템 종료
-------------------------------""")
+def precedence(op):
+    '''연산자 우선순위 계산함수'''
+    if op in '()': return 0
+    elif op in '+-': return 1
+    elif op in '*/': return 2
+    else: return -1
 
-stack = ArrayStack(3)
+def Infix2Postfix(expr):
+    '''중위표기 -> 후위표기로 바꾸는 함수'''
+    s = ArrayStack(100)
+    output = []
 
-init()
-print(">>> ", end="")
+    for term in expr:
+        if term == '(':
+            s.push(term)
+        
+        elif term == ')':
+            while not s.isEmpty():
+                op = s.pop()
+                if op == '(':
+                    break
+                else:
+                    output.append(op)
+        
+        elif term in "+-*/":
+            while not s.isEmpty():
+                op = s.peek()
+                if precedence(op) >= precedence(term):
+                    output.append(op)
+                    s.pop()
+                else: break
+            s.push(term)
+        
+        else:
+            output.append(term)
+    
+    while not s.isEmpty():
+        output.append(s.pop())
+    
+    return ''.join(output)
 
-while True:
-    c = input()
-    
-    if c == 'push':
-        stack.push(int(input("정수를 입력해주세요: ")))
-        init()
-    
-    elif c == 'pop':
-        print(stack.pop())
-    
-    elif c == "peek":
-        print(stack.peek())
-    
-    elif c == "clear":
-        stack.delete_all()
-        init()
-    
-    elif c == "reverse":
-        stack.reverse()
-        init()
-    
-    elif c == 'print':
-        print(stack)
-    
-    elif c == 'exit':
-        break
-
-    else:
-        print("Error: Invalid input")
-    print(">>> ", end="")
+print(Infix2Postfix(list(input("수식 입력: "))))
